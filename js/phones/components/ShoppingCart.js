@@ -1,12 +1,12 @@
 export default class ShoppingCart {
   constructor(element) {
-    this._element = element;
+    this.element = element;
 
-    this._render();
+    this.render();
   }
 
-  _render() {
-    this._element.innerHTML = `
+  render() {
+    this.element.innerHTML = `
       <div class="shopping-cart">
         <h4>Shopping Cart</h4>
         <ul>

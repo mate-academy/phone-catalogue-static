@@ -7,32 +7,57 @@ import * as phonesAPI from '../api/phones.js';
 
 export default class PhonesPage {
   constructor(element) {
-    this._element = element;
+    this.element = element;
 
     this.state = {
-      phones: phonesAPI.getAll()
+      phones: phonesAPI.getAll(),
+      selectedPhone: null,
     };
 
-    this._render();
-
-    this._initComponent(PhonesCatalog, {
-      phones: this.state.phones,
-    });
-
-    this._initComponent(PhoneViewer);
-    this._initComponent(ShoppingCart);
-    this._initComponent(Filter);
+    this.render();
   }
 
-  _initComponent(constructor, props = {}) {
+  updateChildren() {
+    this.initComponent(PhonesCatalog, {
+      phones: this.state.phones,
+
+      onPhoneSelected: (phoneId) => {
+        this.setState({
+          selectedPhone: phonesAPI.getById(phoneId),
+        });
+      }
+    });
+
+    this.initComponent(PhoneViewer, {
+      phone: this.state.selectedPhone,
+    });
+
+    this.initComponent(ShoppingCart);
+    this.initComponent(Filter);
+  }
+
+  initComponent(constructor, props = {}) {
     const componentName = constructor.name;
-    const element = this._element.querySelector(`[data-component="${componentName}"]`);
+    const element = this.element.querySelector(`[data-component="${componentName}"]`);
+
+    if (!element) {
+      return;
+    }
 
     new constructor(element, props);
   }
 
-  _render() {
-    this._element.innerHTML = `
+  setState(newState) {
+    this.state = {
+      ...this.state,
+      ...newState,
+    };
+
+    this.render();
+  }
+
+  render() {
+    this.element.innerHTML = `
       <div class="row">
 
         <!--Sidebar-->
@@ -48,10 +73,15 @@ export default class PhonesPage {
   
         <!--Main content-->
         <div class="col-md-10">
-          <div data-component="PhonesCatalog"></div>
-          <div data-component="PhoneViewer"></div>
+          ${ this.state.selectedPhone ? `
+            <div data-component="PhoneViewer"></div>
+          ` : `
+            <div data-component="PhonesCatalog"></div>
+          `}
         </div>
       </div>
     `;
+
+    this.updateChildren();
   }
 }

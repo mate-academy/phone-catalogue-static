@@ -1,21 +1,36 @@
 export default class PhonesCatalog {
   constructor(element, props) {
-    this._element = element;
-    this._props = props;
+    this.element = element;
+    this.props = props;
 
-    this._render();
+    this.render();
+
+    this.element.addEventListener('click', (event) => {
+      const phoneLink = event.target.closest('[data-element="phone-link"]');
+
+      if (!phoneLink) {
+        return;
+      }
+
+      this.props.onPhoneSelected(phoneLink.dataset.phoneId);
+    });
   }
 
-  _render() {
-    const { phones } = this._props;
+  render() {
+    const { phones } = this.props;
 
-    this._element.innerHTML = `
+    this.element.innerHTML = `
       <div class="phones-catalog">
         <h4>Phones Catalog</h4>
         <ul class="phones">
           ${ phones.map(phone => `
             <li class="thumbnail">
-              <a href="#!/phones/${phone.id}" class="thumb">
+              <a
+                data-element="phone-link"
+                data-phone-id="${phone.id}"
+                href="#!/phones/${phone.id}"
+                class="thumb"
+              >
                 <img alt="${phone.name}" src="${phone.imageUrl}">
               </a>
   
@@ -25,7 +40,13 @@ export default class PhonesCatalog {
                 </a>
               </div>
   
-              <a href="#!/phones/${phone.id}">${phone.name}</a>
+              <a
+                data-element="phone-link"
+                data-phone-id="${phone.id}"
+                href="#!/phones/${phone.id}"
+              >
+                ${phone.name}
+              </a>
               <p>${phone.snippet}</p>
             </li>
           `).join('') }
